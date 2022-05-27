@@ -15,7 +15,8 @@ import type {
   CreditScoreAttestation,
   CredentialPayload,
   DidKey,
-  JWT
+  JWT,
+  JWK
 } from "../../types"
 import type {
   CreateCredentialOptions,
@@ -26,7 +27,8 @@ import type {
  * Build a VerifiableCredential containing an attestation for the given holder.
  */
 export async function buildAndSignVerifiableCredential(
-  signer: Issuer,
+  issuerId: string,
+  privateKey: JWK,
   subject: string | DidKey,
   attestation: KYCAMLAttestation | CreditScoreAttestation,
   payload: Partial<CredentialPayload> = {},
@@ -47,12 +49,12 @@ export async function buildAndSignVerifiableCredential(
         [type]: attestation
       },
       issuanceDate: new Date(),
-      issuer: { id: signer.did }
+      issuer: { id: issuerId }
     },
     payload
   )
 
-  return encodeVerifiableCredential(vcPayload, signer, options)
+  return encodeVerifiableCredential(vcPayload, privateKey, options)
 }
 
 /**
@@ -60,13 +62,15 @@ export async function buildAndSignVerifiableCredential(
  */
 export async function buildAndSignFulfillment(
   signer: Issuer,
+  privateKey: JWK,
   application: DecodedCredentialApplication,
   attestation: KYCAMLAttestation | CreditScoreAttestation,
   payload: Partial<CredentialPayload> = {},
   options?: CreatePresentationOptions
 ): Promise<EncodedCredentialFulfillment> {
   const encodedCredentials = await buildAndSignVerifiableCredential(
-    signer,
+    signer.did,
+    privateKey,
     application.holder,
     attestation,
     payload

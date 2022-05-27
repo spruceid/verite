@@ -5,7 +5,7 @@ import { buildCredentialApplication } from "../../lib/issuer/credential-applicat
 import { buildAndSignFulfillment } from "../../lib/issuer/credential-fulfillment"
 import { buildKycAmlManifest } from "../../lib/issuer/credential-manifest"
 import { decodeVerifiablePresentation } from "../../lib/utils/credentials"
-import { buildIssuer, randomDidKey } from "../../lib/utils/did-fns"
+import { buildIssuer, buildPrivateKeyJwk, randomDidKey } from "../../lib/utils/did-fns"
 import { validateCredentialApplication } from "../../lib/validators/validate-credential-application"
 import { kycAmlAttestationFixture } from "../fixtures/attestations"
 import { revocationListFixture } from "../fixtures/revocation-list"
@@ -23,6 +23,7 @@ describe("issuance", () => {
      */
     const issuerDidKey = randomDidKey(randomBytes)
     const issuer = buildIssuer(issuerDidKey.subject, issuerDidKey.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDidKey.privateKey)
     const clientDidKey = randomDidKey(randomBytes)
 
     /**
@@ -53,6 +54,7 @@ describe("issuance", () => {
      */
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       credentialApplication,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }
@@ -93,6 +95,7 @@ describe("issuance", () => {
     const issuerDidKey = randomDidKey(randomBytes)
     const didWeb = "did:web:example.com"
     const issuer = buildIssuer("did:web:example.com", issuerDidKey.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDidKey.privateKey)
     const publicKey = Buffer.from(issuerDidKey.publicKey).toString("base64")
 
     const clientDidKey = randomDidKey(randomBytes)
@@ -147,6 +150,7 @@ describe("issuance", () => {
      */
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       credentialApplication,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }

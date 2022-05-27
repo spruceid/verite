@@ -11,6 +11,7 @@ import {
 import { buildKycAmlManifest } from "../../../lib/issuer/credential-manifest"
 import {
   buildIssuer,
+  buildPrivateKeyJwk,
   decodeVerifiableCredential,
   decodeVerifiablePresentation,
   randomDidKey
@@ -23,6 +24,7 @@ describe("buildAndSignVerifiableCredential", () => {
     // Map Issuer DID to Issuer for signing
     const issuerDid = randomDidKey(randomBytes)
     const issuer = buildIssuer(issuerDid.subject, issuerDid.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDid.privateKey)
 
     // Subject DID
     const subjectDid = randomDidKey(randomBytes)
@@ -32,7 +34,8 @@ describe("buildAndSignVerifiableCredential", () => {
 
     // Builds a signed Verifiable Credential
     const vc = await buildAndSignVerifiableCredential(
-      issuer,
+      issuer.did,
+      privateKey,
       subjectDid,
       attestation,
       // issuanceDate defaults to now, but for testing we will stub it out
@@ -67,6 +70,7 @@ describe("buildAndSignVerifiableCredential", () => {
     // Map Issuer DID to Issuer for signing
     const issuerDid = randomDidKey(randomBytes)
     const issuer = buildIssuer(issuerDid.subject, issuerDid.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDid.privateKey)
 
     // Subject DID
     const subjectDid = randomDidKey(randomBytes)
@@ -82,7 +86,8 @@ describe("buildAndSignVerifiableCredential", () => {
       statusListCredential: "https://example.com/credentials/status/3"
     }
     const vc = await buildAndSignVerifiableCredential(
-      issuer,
+      issuer.did,
+      privateKey,
       subjectDid,
       attestation,
       { credentialStatus }
@@ -105,6 +110,7 @@ describe("buildAndSignFulfillment", () => {
     // Map Issuer DID to Issuer for signing
     const issuerDid = randomDidKey(randomBytes)
     const issuer = buildIssuer(issuerDid.subject, issuerDid.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDid.privateKey)
 
     const credentialIssuer = { id: issuer.did, name: "Verite" }
     const manifest = buildKycAmlManifest(credentialIssuer)
@@ -121,6 +127,7 @@ describe("buildAndSignFulfillment", () => {
     const attestation = kycAmlAttestationFixture
     const encodedFulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       attestation
     )

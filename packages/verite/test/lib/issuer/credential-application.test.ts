@@ -6,7 +6,7 @@ import {
   decodeCredentialApplication
 } from "../../../lib/issuer/credential-application"
 import { buildKycAmlManifest } from "../../../lib/issuer/credential-manifest"
-import { buildIssuer, randomDidKey } from "../../../lib/utils/did-fns"
+import { buildIssuer, buildPrivateKeyJwk, randomDidKey } from "../../../lib/utils/did-fns"
 import { generateManifestAndIssuer } from "../../support/manifest-fns"
 
 describe("buildCredentialApplication", () => {

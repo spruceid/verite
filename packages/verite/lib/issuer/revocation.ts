@@ -12,6 +12,7 @@ import type {
   CredentialPayload,
   EncodedRevocationListCredential,
   Issuer,
+  JWK,
   MaybeRevocableCredential,
   RevocableCredential,
   RevocationList,
@@ -34,9 +35,9 @@ type GenerateRevocationListOptions = {
    */
   issuer: string
   /**
-   * The credential signer
+   * The credential signing private key
    */
-  signer: Issuer
+  privateKey: JWK,
   /**
    * The creation date of this revocation list. Defaults to now
    */
@@ -54,7 +55,7 @@ export const generateEncodedRevocationList = async ({
   statusList,
   url,
   issuer,
-  signer,
+  privateKey,
   issuanceDate
 }: GenerateRevocationListOptions): Promise<EncodedRevocationListCredential> => {
   const encodedList = generateBitstring(statusList)
@@ -75,7 +76,7 @@ export const generateEncodedRevocationList = async ({
     }
   }
 
-  return encodeVerifiableCredential(vcPayload, signer)
+  return encodeVerifiableCredential(vcPayload, privateKey)
 }
 
 /**
@@ -100,7 +101,8 @@ export const generateRevocationList = async (
 export const revokeCredential = async (
   credential: RevocableCredential,
   revocationList: RevocationListCredential,
-  signer: Issuer
+  privateKey: JWK,
+  issuerId: string,
 ): Promise<RevocationListCredential> => {
   /**
    * If the credential is not revocable, it can not be revoked
@@ -119,8 +121,8 @@ export const revokeCredential = async (
   return await generateRevocationList({
     statusList: indexArray,
     url: revocationList.id,
-    issuer: signer.did,
-    signer
+    issuer: issuerId,
+    privateKey
   })
 }
 
@@ -135,7 +137,8 @@ export const revokeCredential = async (
 export const unrevokeCredential = async (
   credential: RevocableCredential,
   revocationList: RevocationListCredential,
-  signer: Issuer
+  privateKey: JWK,
+  issuerId: string,
 ): Promise<RevocationListCredential> => {
   /**
    * If the credential is not revocable, it can not be revoked
@@ -159,8 +162,8 @@ export const unrevokeCredential = async (
   return await generateRevocationList({
     statusList: indexArray,
     url: revocationList.id,
-    issuer: signer.did,
-    signer
+    issuer: issuerId,
+    privateKey,
   })
 }
 

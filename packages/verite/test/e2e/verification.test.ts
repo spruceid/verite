@@ -61,7 +61,7 @@ describe("verification", () => {
 async function getClientVerifiableCredential(
   clientDidKey: DidKey
 ): Promise<RevocableCredential[]> {
-  const { manifest, issuer } = await generateManifestAndIssuer()
+  const { manifest, issuer, privateKey } = await generateManifestAndIssuer()
 
   // 0. PREREQ: Ensure client has a valid KYC credential
   const encodedApplication = await buildCredentialApplication(
@@ -75,6 +75,7 @@ async function getClientVerifiableCredential(
 
   const fulfillment = await buildAndSignFulfillment(
     issuer,
+    privateKey,
     application,
     kycAmlAttestationFixture,
     { credentialStatus: revocationListFixture }

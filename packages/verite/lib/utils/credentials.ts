@@ -5,6 +5,8 @@ import {
   verifyPresentation
 } from "did-jwt-vc"
 
+const DIDKit = require('@spruceid/didkit');
+
 import { VerificationError } from "../errors"
 import { didResolver } from "./did-fns"
 
@@ -13,6 +15,7 @@ import type {
   JwtCredentialPayload,
   Issuer,
   JWT,
+  JWK,
   VerifiableCredential,
   RevocableCredential,
   RevocationListCredential,
@@ -32,32 +35,13 @@ import type {
  */
 export async function encodeVerifiableCredential(
   vcPayload: CredentialPayload | JwtCredentialPayload,
-  signer: Issuer,
+  privateKey: JWK,
   options: CreateCredentialOptions = {}
 ): Promise<JWT> {
-  const payload = Object.assign({
-    vc: vcPayload
-  })
-  if (vcPayload.id) {
-    payload.jti = vcPayload.id
-  }
-  if (vcPayload.issuanceDate) {
-    payload.nbf = Math.round(Date.parse(vcPayload.issuanceDate) / 1000)
-  }
-  if (vcPayload.expirationDate) {
-    payload.exp = Math.round(Date.parse(vcPayload.expirationDate) / 1000)
-  }
-  if (vcPayload.issuer) {
-    payload.iss =
-      typeof vcPayload.issuer === "string"
-        ? vcPayload.issuer
-        : vcPayload.issuer.id
-  }
-  if (vcPayload.credentialSubject && vcPayload.credentialSubject.id) {
-    payload.sub = vcPayload.credentialSubject.id
-  }
-
-  return createVerifiableCredentialJwt(payload, signer, options)
+  return DIDKit.issueCredential(vcPayload, {
+    proofFormat: "jwt",
+    ...options
+  }, privateKey)
 }
 
 /**

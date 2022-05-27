@@ -5,8 +5,9 @@ import { getResolver as getKeyResolver } from "key-did-resolver"
 import Multibase from "multibase"
 import Multicodec from "multicodec"
 import { getResolver as getWebResolver } from "web-did-resolver"
+import { parseKey, bytesToBase64url } from "./did-jwt-fns"
 
-import type { DidKey, Issuer } from "../../types"
+import type { DidKey, Issuer, JWK } from "../../types"
 
 type RandomBytesMethod = (size: number) => Uint8Array
 
@@ -70,6 +71,20 @@ export function buildIssuer(
   }
 }
 
+export function buildPrivateKeyJwk(
+  privateKey: string | Uint8Array
+): JWK {
+  const privateKeyBytes: Uint8Array = parseKey(privateKey)
+  if (privateKeyBytes.length !== 64) {
+    throw new Error(`Invalid private key format. Expecting 64 bytes, but got ${privateKeyBytes.length}`)
+  }
+  return {
+    kty: "OKP",
+    crv: "Ed25519",
+    x: bytesToBase64url(privateKeyBytes.slice(0, 32)),
+    d: bytesToBase64url(privateKeyBytes.slice(32, 64)),
+  }
+}
 const didWebResolver = getWebResolver()
 const didKeyResolver = getKeyResolver()
 

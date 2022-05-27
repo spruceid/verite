@@ -4,6 +4,7 @@ import jsonpath from "jsonpath"
 import { buildAndSignVerifiableCredential } from "../../../lib/issuer/credential-fulfillment"
 import {
   buildIssuer,
+  buildPrivateKeyJwk,
   decodeVerifiableCredential,
   decodeVerifiablePresentation,
   randomDidKey
@@ -20,10 +21,12 @@ describe("buildPresentationSubmission", () => {
     // DID of the issuer
     const issuerDid = randomDidKey(randomBytes)
     const issuer = buildIssuer(issuerDid.subject, issuerDid.privateKey)
+    const privateKey = buildPrivateKeyJwk(issuerDid.privateKey)
 
     // Builds a signed Verifiable Credential
     const encodedCredential = await buildAndSignVerifiableCredential(
-      issuer,
+      issuer.did,
+      privateKey,
       didKey,
       kycAmlAttestationFixture
     )

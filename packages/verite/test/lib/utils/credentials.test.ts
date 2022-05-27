@@ -1,6 +1,6 @@
 import { VerificationError } from "../../../lib/errors"
 import {
-  buildIssuer,
+  buildPrivateKeyJwk,
   decodeVerifiableCredential,
   decodeVerifiablePresentation,
   encodeVerifiableCredential
@@ -45,10 +45,8 @@ describe("VC decoding", () => {
 
 describe("VC signing", () => {
   it("signs a VC", async () => {
-    const signer = buildIssuer(
-      "did:key:z6MksGKh23mHZz2FpeND6WxJttd8TWhkTga7mtbM1x1zM65m",
-      "1f0465e2546027554c41584ca53971dfc3bf44f9b287cb15b5732ad84adb4e63be5aa9b3df96e696f4eaa500ec0b58bf5dfde59200571b44288cc9981279a238"
-    )
+    const privateKeyHex = "1f0465e2546027554c41584ca53971dfc3bf44f9b287cb15b5732ad84adb4e63be5aa9b3df96e696f4eaa500ec0b58bf5dfde59200571b44288cc9981279a238";
+    const privateKey = buildPrivateKeyJwk(privateKeyHex)
     const issuer = "did:key:z6MksGKh23mHZz2FpeND6WxJttd8TWhkTga7mtbM1x1zM65m"
     const issuanceDate = new Date()
     const vcPayload: CredentialPayload = {
@@ -63,7 +61,7 @@ describe("VC signing", () => {
         }
       }
     }
-    const result = await encodeVerifiableCredential(vcPayload, signer)
+    const result = await encodeVerifiableCredential(vcPayload, privateKey)
     const decoded = await decodeVerifiableCredential(result)
     expect(decoded.type.length).toEqual(1)
     expect(decoded.type[0]).toEqual("VerifiableCredential")

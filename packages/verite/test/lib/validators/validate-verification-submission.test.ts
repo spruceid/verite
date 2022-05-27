@@ -30,7 +30,7 @@ describe("Submission validator", () => {
   it("validates a KYC Verification Submission", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer()
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer()
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -43,6 +43,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }
@@ -76,7 +77,7 @@ describe("Submission validator", () => {
   it("validates a Credit Score Verification Submission", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer("creditScore")
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer("creditScore")
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -89,6 +90,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       creditScoreAttestationFixture
     )
@@ -122,7 +124,7 @@ describe("Submission validator", () => {
   it("rejects if the issuer is not trusted", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer()
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer()
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -135,6 +137,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }
@@ -167,7 +170,7 @@ describe("Submission validator", () => {
   it("rejects if the credit score is too low", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer("creditScore")
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer("creditScore")
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -180,6 +183,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       creditScoreAttestationFixture
     )
@@ -213,7 +217,7 @@ describe("Submission validator", () => {
   it("rejects if the submission includes a KYC credential when a Credit Score is required", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer("kyc")
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer("kyc")
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -226,6 +230,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }
@@ -259,7 +264,7 @@ describe("Submission validator", () => {
   it("rejects if the submission is not signed by the subject", async () => {
     const clientDidKey = randomDidKey(randomBytes)
     const verifierDidKey = randomDidKey(randomBytes)
-    const { manifest, issuer } = await generateManifestAndIssuer()
+    const { manifest, issuer, privateKey } = await generateManifestAndIssuer()
     const encodedApplication = await buildCredentialApplication(
       clientDidKey,
       manifest
@@ -272,6 +277,7 @@ describe("Submission validator", () => {
 
     const fulfillment = await buildAndSignFulfillment(
       issuer,
+      privateKey,
       application,
       kycAmlAttestationFixture,
       { credentialStatus: revocationListFixture }
